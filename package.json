@@ -1,0 +1,20 @@
+{
+  "name": "zenit-map-editor",
+  "dependencies": {
+    "electron": "1.7.4"
+  },
+  "devDependencies": {
+    "babel-eslint": "7.2.3",
+    "eslint": "4.2.0",
+    "eslint-config-airbnb-base": "11.2.0",
+    "eslint-plugin-import": "2.7.0"
+  },
+  "scripts": {
+    "start": "electron ./app/main.js"
+  },
+  "main": "main.js",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "Editor for Zenit JZ 2009 fuel maps",
+  "author": "mater"
+}
