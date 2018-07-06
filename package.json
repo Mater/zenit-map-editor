@@ -1,20 +1,42 @@
 {
   "name": "zenit-map-editor",
+  "version": "0.0.1",
+  "description": "Editor for Zenit JZ 2009 fuel maps",
+  "author": "mater",
+  "private": true,
+  "main": "public/electron.js",
   "dependencies": {
-    "electron": "1.7.4"
-  },
-  "devDependencies": {
-    "babel-eslint": "7.2.3",
-    "eslint": "4.2.0",
-    "eslint-config-airbnb-base": "11.2.0",
-    "eslint-plugin-import": "2.7.0"
+    "electron": "^2.0.3",
+    "electron-is-dev": "^0.3.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-scripts": "^1.1.4",
+    "react-tabs": "^2.2.2"
   },
   "scripts": {
-    "start": "electron ./app/main.js"
+    "postinstall": "electron-rebuild",
+    "electron": "concurrently \"cross-env BROWSER=none npm start\" \"wait-on http://localhost:3005 && electron .\"",
+    "start": "cross-env PORT=3005 react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "lint": "eslint --fix ./src/"
   },
-  "main": "main.js",
-  "version": "0.0.0",
-  "license": "MIT",
-  "description": "Editor for Zenit JZ 2009 fuel maps",
-  "author": "mater"
+  "devDependencies": {
+    "concurrently": "^3.6.0",
+    "cross-env": "^5.2.0",
+    "electron-rebuild": "^1.7.3",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.10.0",
+    "jest-raw-loader": "^1.0.1",
+    "react-app-rewired": "^1.5.2",
+    "wait-on": "^2.1.0"
+  },
+  "jest": {
+    "transform": {
+      "\\.map$": "jest-raw-loader"
+    }
+  }
 }
