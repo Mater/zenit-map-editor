@@ -1,4 +1,4 @@
-import { MapPoint, FuelMap, MapFile } from '../types';
+import { MapPoint, MapFile } from '../types';
 
 export interface CanvasConfig {
   width: number;
@@ -92,56 +92,41 @@ export class MapService {
    * Обновление viewport на основе данных карт
    */
   updateViewport(files: MapFile[]): void {
-    if (files.length === 0) {
-      this.viewport = {
-        minX: 0,
-        maxX: 1000,
-        minY: 0,
-        maxY: 1000,
-        scaleX: 1,
-        scaleY: 1,
-        offsetX: 0,
-        offsetY: 0,
-      };
-      return;
+    // Устанавливаем фиксированные границы с minX и minY = 0
+    let maxX = 0;
+    let maxY = 0;
+
+    // Находим максимальные значения из данных
+    if (files.length > 0) {
+      files.forEach(file => {
+        if (!file.visible) return;
+
+        if (file.gasolineVisible && file.data.gasoline.length > 0) {
+          file.data.gasoline.forEach(point => {
+            maxX = Math.max(maxX, point.x);
+            maxY = Math.max(maxY, point.y);
+          });
+        }
+
+        if (file.gasVisible && file.data.gas.length > 0) {
+          file.data.gas.forEach(point => {
+            maxX = Math.max(maxX, point.x);
+            maxY = Math.max(maxY, point.y);
+          });
+        }
+      });
     }
 
-    let minX = Infinity;
-    let maxX = -Infinity;
-    let minY = Infinity;
-    let maxY = -Infinity;
+    if (maxX === 0 && maxY === 0) {
+      maxX = 1000;
+      maxY = 50;
+    }
 
-    // Находим границы всех видимых карт
-    files.forEach(file => {
-      if (!file.visible) return;
-
-      if (file.gasolineVisible && file.data.gasoline.length > 0) {
-        file.data.gasoline.forEach(point => {
-          minX = Math.min(minX, point.x);
-          maxX = Math.max(maxX, point.x);
-          minY = Math.min(minY, point.y);
-          maxY = Math.max(maxY, point.y);
-        });
-      }
-
-      if (file.gasVisible && file.data.gas.length > 0) {
-        file.data.gas.forEach(point => {
-          minX = Math.min(minX, point.x);
-          maxX = Math.max(maxX, point.x);
-          minY = Math.min(minY, point.y);
-          maxY = Math.max(maxY, point.y);
-        });
-      }
-    });
-
-    // Добавляем отступы
-    const paddingX = (maxX - minX) * 0.1;
-    const paddingY = (maxY - minY) * 0.1;
-
-    this.viewport.minX = minX - paddingX;
-    this.viewport.maxX = maxX + paddingX;
-    this.viewport.minY = minY - paddingY;
-    this.viewport.maxY = maxY + paddingY;
+    // Устанавливаем viewport с minX = 0 и minY = 0
+    this.viewport.minX = 0;
+    this.viewport.maxX = maxX;
+    this.viewport.minY = 0;
+    this.viewport.maxY = maxY;
 
     // Вычисляем масштаб
     const availableWidth = this.config.width - 2 * this.config.padding;
@@ -259,21 +244,31 @@ export class MapService {
   ): void {
     if (!this.ctx || points.length === 0) return;
 
-    this.ctx.fillStyle = color;
     this.ctx.globalAlpha = opacity;
 
     points.forEach(point => {
       const screenPos = this.worldToScreen(point.x, point.y);
+      const size = this.config.pointRadius * 2;
+      const halfSize = this.config.pointRadius;
 
-      this.ctx!.beginPath();
-      this.ctx!.arc(
-        screenPos.x,
-        screenPos.y,
-        this.config.pointRadius,
-        0,
-        2 * Math.PI
+      // Рисуем квадрат с заливкой
+      this.ctx!.fillStyle = color;
+      this.ctx!.fillRect(
+        screenPos.x - halfSize,
+        screenPos.y - halfSize,
+        size,
+        size
       );
-      this.ctx!.fill();
+
+      // Рисуем тонкий бордер
+      this.ctx!.strokeStyle = '#000000';
+      this.ctx!.lineWidth = 1;
+      this.ctx!.strokeRect(
+        screenPos.x - halfSize,
+        screenPos.y - halfSize,
+        size,
+        size
+      );
     });
 
     this.ctx.globalAlpha = 1;
@@ -287,24 +282,58 @@ export class MapService {
 
     this.ctx.fillStyle = this.config.colors.text;
     this.ctx.font = '12px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
 
-    // Подпись оси X
-    const xLabelPos = this.worldToScreen(
-      (this.viewport.minX + this.viewport.maxX) / 2,
-      this.viewport.minY - 20
-    );
-    this.ctx.fillText('Давление (мбар)', xLabelPos.x, xLabelPos.y);
+    // Подпись оси X - размещаем внизу по центру
+    const xLabelX = this.config.width / 2;
+    const xLabelY = this.config.height - 10;
+    this.ctx.fillText('Давление (мбар)', xLabelX, xLabelY);
 
-    // Подпись оси Y
-    const yLabelPos = this.worldToScreen(
-      this.viewport.minX - 30,
-      (this.viewport.minY + this.viewport.maxY) / 2
-    );
+    // Подпись оси Y - размещаем слева по центру, повернута на 90 градусов
+    const yLabelX = 20;
+    const yLabelY = this.config.height / 2;
     this.ctx.save();
-    this.ctx.translate(yLabelPos.x, yLabelPos.y);
+    this.ctx.translate(yLabelX, yLabelY);
     this.ctx.rotate(-Math.PI / 2);
     this.ctx.fillText('Время впрыска (мс)', 0, 0);
     this.ctx.restore();
+  }
+
+  /**
+   * Отрисовка значений на осях
+   */
+  private drawAxisValues(): void {
+    if (!this.ctx) return;
+
+    this.ctx.fillStyle = this.config.colors.text;
+    this.ctx.font = '10px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'top';
+
+    // Значения на оси X
+    const xStep = (this.viewport.maxX - this.viewport.minX) / 10;
+    for (let i = 0; i <= 10; i++) {
+      const x = this.viewport.minX + i * xStep;
+      const screenPos = this.worldToScreen(x, this.viewport.minY);
+
+      this.ctx.fillText(x.toFixed(0), screenPos.x, screenPos.y + 5);
+    }
+
+    // Значения на оси Y
+    this.ctx.textAlign = 'right';
+    this.ctx.textBaseline = 'middle';
+    const yStep = (this.viewport.maxY - this.viewport.minY) / 10;
+    for (let i = 0; i <= 10; i++) {
+      const y = this.viewport.minY + i * yStep;
+      const screenPos = this.worldToScreen(this.viewport.minX, y);
+
+      this.ctx.fillText(y.toFixed(0), screenPos.x - 5, screenPos.y);
+    }
+
+    // Сбрасываем настройки текста
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
   }
 
   /**
@@ -315,9 +344,12 @@ export class MapService {
 
     this.clear();
     this.updateViewport(files);
+
+    // Всегда рисуем сетку и оси
     this.drawGrid();
     this.drawAxes();
     this.drawLabels();
+    this.drawAxisValues();
 
     // Отрисовка карт
     files.forEach(file => {
