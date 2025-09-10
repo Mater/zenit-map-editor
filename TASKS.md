@@ -6,7 +6,7 @@
 
 - [ ] Настройка Electron + React + TypeScript проекта
 - [ ] Конфигурация Vite, Tailwind CSS, ESLint, Prettier
-- [ ] Создание базовой структуры и Zustand store
+- [ ] Создание базовой структуры и store
 - [ ] Настройка главного процесса Electron
 - [ ] Создание preload скрипта с типизированным API
 
@@ -64,9 +64,7 @@
 - **Electron** - Desktop приложение
 - **React 18** - UI библиотека
 - **TypeScript** - Статическая типизация
-- **Vite** - Быстрая сборка и разработка
 - **Tailwind CSS** - Utility-first CSS
-- **Zustand** - Управление состоянием
 
 **Инструменты разработки:**
 

@@ -47,7 +47,6 @@ src/
 │   ├── components/      # React компоненты
 │   ├── hooks/           # React хуки
 │   ├── services/        # Бизнес-логика
-│   ├── store/           # Zustand store
 │   └── types/           # TypeScript типы
 └── shared/              # Общий код
 ```
@@ -138,7 +137,7 @@ src/
 - Координатная система и масштабирование
 - Обработка взаимодействий
 
-**Zustand Store:**
+**Store:**
 
 - Управление состоянием файлов
 - Выбор карт для объединения
@@ -171,7 +170,6 @@ src/
 │   ├── components/      # React компоненты
 │   ├── hooks/           # React хуки
 │   ├── services/        # Бизнес-логика
-│   ├── store/           # Zustand store
 │   └── types/           # TypeScript типы
 └── shared/              # Общий код
 ```
@@ -189,7 +187,7 @@ src/
 
 - Настройка Electron + React + TypeScript проекта
 - Конфигурация Vite, Tailwind CSS, ESLint, Prettier
-- Создание базовой структуры и Zustand store
+- Создание базовой структуры и store
 
 ### Этап 2: UI компоненты
 
@@ -216,9 +214,7 @@ src/
 - **Electron** - Desktop приложение
 - **React 18** - UI библиотека
 - **TypeScript** - Статическая типизация
-- **Vite** - Быстрая сборка и разработка
 - **Tailwind CSS** - Utility-first CSS
-- **Zustand** - Управление состоянием
 
 **Инструменты разработки:**
 
