@@ -168,8 +168,8 @@ interface AppState {
 interface AppActions {
   loadFiles: (files: File[]) => Promise<void>;
   toggleFileVisibility: (fileId: string) => void;
-  toggleMapVisibility: (fileId: string, mapType: "gasoline" | "gas") => void;
-  selectMap: (fileId: string, mapType: "gasoline" | "gas") => void;
+  toggleMapVisibility: (fileId: string, mapType: 'gasoline' | 'gas') => void;
+  selectMap: (fileId: string, mapType: 'gasoline' | 'gas') => void;
   saveMergedMap: (filename: string) => Promise<void>;
 }
 ```
@@ -178,10 +178,10 @@ interface AppActions {
 
 ### Этап 1 готов, когда:
 
-- [ ] Проект запускается без ошибок
-- [ ] Tailwind CSS работает
-- [ ] ESLint и Prettier настроены
-- [ ] Базовая структура создана
+- [x] Проект запускается без ошибок
+- [x] Tailwind CSS работает
+- [x] ESLint и Prettier настроены
+- [x] Базовая структура создана
 
 ### Этап 2 готов, когда:
 

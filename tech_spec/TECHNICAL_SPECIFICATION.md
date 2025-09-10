@@ -161,8 +161,8 @@ interface AppState {
 interface AppActions {
   loadFiles: (files: File[]) => Promise<void>;
   toggleFileVisibility: (fileId: string) => void;
-  toggleMapVisibility: (fileId: string, mapType: "gasoline" | "gas") => void;
-  selectMap: (fileId: string, mapType: "gasoline" | "gas") => void;
+  toggleMapVisibility: (fileId: string, mapType: 'gasoline' | 'gas') => void;
+  selectMap: (fileId: string, mapType: 'gasoline' | 'gas') => void;
   saveMergedMap: (filename: string) => Promise<void>;
 }
 ```
