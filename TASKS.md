@@ -5,7 +5,7 @@
 ### Этап 1: Базовая структура
 
 - [ ] Настройка Electron + React + TypeScript проекта
-- [ ] Конфигурация Vite, Tailwind CSS, ESLint, Prettier
+- [ ] Конфигурация Tailwind CSS, ESLint, Prettier
 - [ ] Создание базовой структуры и store
 - [ ] Настройка главного процесса Electron
 - [ ] Создание preload скрипта с типизированным API

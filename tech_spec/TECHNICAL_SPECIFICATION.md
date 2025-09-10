@@ -177,7 +177,6 @@ src/
 **Конфигурация:**
 
 - TypeScript, ESLint, Prettier
-- Vite для сборки
 - Tailwind CSS для стилей
 - Electron Builder для сборки приложения
 
@@ -186,7 +185,7 @@ src/
 ### Этап 1: Базовая структура
 
 - Настройка Electron + React + TypeScript проекта
-- Конфигурация Vite, Tailwind CSS, ESLint, Prettier
+- Конфигурация Tailwind CSS, ESLint, Prettier
 - Создание базовой структуры и store
 
 ### Этап 2: UI компоненты
