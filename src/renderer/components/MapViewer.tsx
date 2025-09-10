@@ -82,13 +82,13 @@ export function MapViewer({ className = '' }: MapViewerProps) {
   }, [initializeMapService, renderMaps, canvasSize.width, canvasSize.height]);
 
   /**
-   * Перерисовка при изменении файлов
+   * Перерисовка при изменении файлов или активного файла
    */
   useEffect(() => {
     if (canvasSize.width > 0 && canvasSize.height > 0) {
       renderMaps();
     }
-  }, [renderMaps, canvasSize.width, canvasSize.height]);
+  }, [renderMaps, canvasSize.width, canvasSize.height, state.activeFile]);
 
   /**
    * Обработка движения мыши для показа информации о точках
@@ -176,6 +176,10 @@ export function MapViewer({ className = '' }: MapViewerProps) {
             <div className="flex items-center space-x-1">
               <div className="w-3 h-3 bg-yellow-500 border border-black"></div>
               <span>Газ</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <div className="w-3 h-3 bg-blue-500 border-2 border-red-500"></div>
+              <span className="text-xs text-gray-600">Активный файл</span>
             </div>
           </div>
         </div>

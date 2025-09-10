@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { useFiles } from '../hooks/useFiles';
 import { useMaps } from '../hooks/useMaps';
@@ -13,9 +13,43 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
   const { loadFilesFromFileList, saveMergedMap } = useFiles();
   const { canMergeMaps } = useMaps();
 
-  const [filename, setFilename] = useState('бензиновая карта.map');
+  const [filename, setFilename] = useState('имя_файлаM.map');
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * Генерация имени файла на основе выбранной бензиновой карты или первого файла
+   */
+  const generateFilename = useCallback(() => {
+    // Если выбрана бензиновая карта, используем её имя
+    if (state.selectedGasolineMap) {
+      const selectedFile = state.files.find(
+        file => file.id === state.selectedGasolineMap
+      );
+      if (selectedFile) {
+        const baseName = selectedFile.name.replace(/\.map$/i, '');
+        return `${baseName}M.map`;
+      }
+    }
+
+    // Если есть файлы, используем имя первого файла
+    if (state.files.length > 0) {
+      const firstFile = state.files[0];
+      const baseName = firstFile.name.replace(/\.map$/i, '');
+      return `${baseName}M.map`;
+    }
+
+    // По умолчанию
+    return '';
+  }, [state.selectedGasolineMap, state.files]);
+
+  /**
+   * Автоматическое обновление имени файла при изменении выбранной карты или файлов
+   */
+  useEffect(() => {
+    const newFilename = generateFilename();
+    setFilename(newFilename);
+  }, [generateFilename]);
 
   /**
    * Обработка выбора файлов через диалог
@@ -114,6 +148,33 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
       actions.selectMap(fileId, mapType);
     },
     [actions]
+  );
+
+  /**
+   * Удаление файла
+   */
+  const handleDeleteFile = useCallback(
+    (fileId: string) => {
+      if (window.confirm('Вы уверены, что хотите удалить этот файл?')) {
+        actions.deleteFile(fileId);
+      }
+    },
+    [actions]
+  );
+
+  /**
+   * Установка активного файла
+   */
+  const handleSetActiveFile = useCallback(
+    (fileId: string) => {
+      // Если файл уже активен, снимаем выделение
+      if (state.activeFile === fileId) {
+        actions.setActiveFile(null);
+      } else {
+        actions.setActiveFile(fileId);
+      }
+    },
+    [actions, state.activeFile]
   );
 
   /**
@@ -224,9 +285,12 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
                 file={file}
                 isSelectedGasoline={state.selectedGasolineMap === file.id}
                 isSelectedGas={state.selectedGasMap === file.id}
+                isActive={state.activeFile === file.id}
                 onToggleFileVisibility={toggleFileVisibility}
                 onToggleMapVisibility={toggleMapVisibility}
                 onSelectMap={selectMap}
+                onSetActiveFile={handleSetActiveFile}
+                onDeleteFile={handleDeleteFile}
               />
             ))}
 
@@ -288,7 +352,7 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
               value={filename}
               onChange={e => setFilename(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              placeholder="бензиновая карта.map"
+              placeholder={generateFilename()}
             />
           </div>
           <button
@@ -320,38 +384,80 @@ interface FileItemProps {
   file: MapFile;
   isSelectedGasoline: boolean;
   isSelectedGas: boolean;
+  isActive: boolean;
   onToggleFileVisibility: (fileId: string) => void;
   onToggleMapVisibility: (fileId: string, mapType: 'gasoline' | 'gas') => void;
   onSelectMap: (fileId: string, mapType: 'gasoline' | 'gas') => void;
+  onSetActiveFile: (fileId: string) => void;
+  onDeleteFile: (fileId: string) => void;
 }
 
 function FileItem({
   file,
   isSelectedGasoline,
   isSelectedGas,
+  isActive,
   onToggleFileVisibility,
   onToggleMapVisibility,
   onSelectMap,
+  onSetActiveFile,
+  onDeleteFile,
 }: FileItemProps) {
   return (
-    <div className="border border-gray-200 rounded-lg p-3 bg-gray-50 hover:bg-gray-100 transition-colors">
+    <div
+      className={`border rounded-lg p-3 transition-colors cursor-pointer ${
+        isActive
+          ? 'border-blue-500 bg-blue-50 shadow-md'
+          : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+      }`}
+      onClick={() => onSetActiveFile(file.id)}
+    >
       {/* Заголовок файла */}
-      <div className="mb-3">
-        <label className="flex items-center space-x-2 cursor-pointer">
+      <div className="mb-3 flex items-center justify-between">
+        <label
+          className="flex items-center space-x-2 cursor-pointer flex-1 min-w-0"
+          onClick={e => e.stopPropagation()}
+        >
           <input
             type="checkbox"
             checked={file.visible}
             onChange={() => onToggleFileVisibility(file.id)}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm font-medium text-gray-900 truncate">
+          <span
+            className={`text-sm font-medium truncate ${
+              isActive ? 'text-blue-900' : 'text-gray-900'
+            }`}
+          >
             {file.name}
           </span>
         </label>
+        <button
+          onClick={e => {
+            e.stopPropagation();
+            onDeleteFile(file.id);
+          }}
+          className="ml-2 p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+          title="Удалить файл"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
       </div>
 
       {/* Карты файла */}
-      <div className="space-y-2">
+      <div className="space-y-2" onClick={e => e.stopPropagation()}>
         {/* Бензиновая карта */}
         <div className="flex items-center justify-between bg-white rounded p-2">
           <label className="flex items-center space-x-2 cursor-pointer">

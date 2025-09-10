@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
-import { AppState, AppActions, MapFile, FuelMap } from '../types';
+import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { AppState, AppActions, MapFile } from '../types';
 import { FileService } from '../services/FileService';
 
 // Начальное состояние
@@ -7,6 +7,7 @@ const initialState: AppState = {
   files: [],
   selectedGasolineMap: null,
   selectedGasMap: null,
+  activeFile: null,
   isLoading: false,
   error: null,
 };
@@ -25,6 +26,8 @@ type AppAction =
       type: 'SELECT_MAP';
       payload: { fileId: string; mapType: 'gasoline' | 'gas' };
     }
+  | { type: 'SET_ACTIVE_FILE'; payload: string | null }
+  | { type: 'DELETE_FILE'; payload: string }
   | { type: 'CLEAR_FILES' };
 
 // Reducer для управления состоянием
@@ -77,12 +80,46 @@ function appReducer(state: AppState, action: AppAction): AppState {
           : 'selectedGasMap']: action.payload.fileId,
       };
 
+    case 'SET_ACTIVE_FILE':
+      return {
+        ...state,
+        activeFile: action.payload,
+      };
+
+    case 'DELETE_FILE':
+      const fileToDelete = state.files.find(file => file.id === action.payload);
+      const newFiles = state.files.filter(file => file.id !== action.payload);
+
+      // Очищаем выбранные карты и активный файл, если удаляемый файл был выбран
+      let newSelectedGasolineMap = state.selectedGasolineMap;
+      let newSelectedGasMap = state.selectedGasMap;
+      let newActiveFile = state.activeFile;
+
+      if (fileToDelete && state.selectedGasolineMap === fileToDelete.id) {
+        newSelectedGasolineMap = null;
+      }
+      if (fileToDelete && state.selectedGasMap === fileToDelete.id) {
+        newSelectedGasMap = null;
+      }
+      if (fileToDelete && state.activeFile === fileToDelete.id) {
+        newActiveFile = null;
+      }
+
+      return {
+        ...state,
+        files: newFiles,
+        selectedGasolineMap: newSelectedGasolineMap,
+        selectedGasMap: newSelectedGasMap,
+        activeFile: newActiveFile,
+      };
+
     case 'CLEAR_FILES':
       return {
         ...state,
         files: [],
         selectedGasolineMap: null,
         selectedGasMap: null,
+        activeFile: null,
       };
 
     default:
@@ -156,6 +193,14 @@ export function AppProvider({ children }: AppProviderProps) {
 
     selectMap: (fileId: string, mapType: 'gasoline' | 'gas') => {
       dispatch({ type: 'SELECT_MAP', payload: { fileId, mapType } });
+    },
+
+    setActiveFile: (fileId: string | null) => {
+      dispatch({ type: 'SET_ACTIVE_FILE', payload: fileId });
+    },
+
+    deleteFile: (fileId: string) => {
+      dispatch({ type: 'DELETE_FILE', payload: fileId });
     },
 
     saveMergedMap: async (filename: string) => {

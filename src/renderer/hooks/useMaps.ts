@@ -1,7 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { MapService, CanvasConfig } from '../services/MapService';
-import { MapFile } from '../types';
 
 export function useMaps() {
   const { state } = useApp();
@@ -33,11 +32,11 @@ export function useMaps() {
     }
 
     try {
-      mapServiceRef.current.render(state.files);
+      mapServiceRef.current.render(state.files, state.activeFile);
     } catch (error) {
       console.error('Ошибка отрисовки карт:', error);
     }
-  }, [state.files]);
+  }, [state.files, state.activeFile]);
 
   /**
    * Получение точки под курсором

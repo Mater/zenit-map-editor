@@ -22,6 +22,7 @@ export interface AppState {
   files: MapFile[];
   selectedGasolineMap: string | null;
   selectedGasMap: string | null;
+  activeFile: string | null; // ID активного файла для подсветки
   isLoading: boolean;
   error: string | null;
 }
@@ -31,5 +32,7 @@ export interface AppActions {
   toggleFileVisibility: (fileId: string) => void;
   toggleMapVisibility: (fileId: string, mapType: 'gasoline' | 'gas') => void;
   selectMap: (fileId: string, mapType: 'gasoline' | 'gas') => void;
+  setActiveFile: (fileId: string | null) => void;
+  deleteFile: (fileId: string) => void;
   saveMergedMap: (filename: string) => Promise<void>;
 }

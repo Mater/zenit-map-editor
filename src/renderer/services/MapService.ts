@@ -240,7 +240,8 @@ export class MapService {
   private drawMapPoints(
     points: MapPoint[],
     color: string,
-    opacity: number = 1
+    opacity: number = 1,
+    isActive: boolean = false
   ): void {
     if (!this.ctx || points.length === 0) return;
 
@@ -260,15 +261,29 @@ export class MapService {
         size
       );
 
-      // Рисуем тонкий бордер
-      this.ctx!.strokeStyle = '#000000';
-      this.ctx!.lineWidth = 1;
+      // Рисуем бордер - более толстый для активного файла
+      this.ctx!.strokeStyle = isActive ? '#FF0000' : '#000000';
+      this.ctx!.lineWidth = isActive ? 3 : 1;
       this.ctx!.strokeRect(
         screenPos.x - halfSize,
         screenPos.y - halfSize,
         size,
         size
       );
+
+      // Добавляем дополнительную подсветку для активного файла
+      if (isActive) {
+        this.ctx!.strokeStyle = '#FF0000';
+        this.ctx!.lineWidth = 1;
+        this.ctx!.globalAlpha = 0.5;
+        this.ctx!.strokeRect(
+          screenPos.x - halfSize - 2,
+          screenPos.y - halfSize - 2,
+          size + 4,
+          size + 4
+        );
+        this.ctx!.globalAlpha = opacity;
+      }
     });
 
     this.ctx.globalAlpha = 1;
@@ -339,7 +354,7 @@ export class MapService {
   /**
    * Отрисовка всех карт
    */
-  render(files: MapFile[]): void {
+  render(files: MapFile[], activeFileId?: string | null): void {
     if (!this.ctx) return;
 
     this.clear();
@@ -356,17 +371,24 @@ export class MapService {
       if (!file.visible) return;
 
       const opacity = file.visible ? 1 : 0.5;
+      const isActive = activeFileId === file.id;
 
       if (file.gasolineVisible && file.data.gasoline.length > 0) {
         this.drawMapPoints(
           file.data.gasoline,
           this.config.colors.gasoline,
-          opacity
+          opacity,
+          isActive
         );
       }
 
       if (file.gasVisible && file.data.gas.length > 0) {
-        this.drawMapPoints(file.data.gas, this.config.colors.gas, opacity);
+        this.drawMapPoints(
+          file.data.gas,
+          this.config.colors.gas,
+          opacity,
+          isActive
+        );
       }
     });
   }
