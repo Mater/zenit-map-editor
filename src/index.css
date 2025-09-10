@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -28,4 +26,143 @@ body {
 #root {
   width: 100%;
   height: 100%;
+}
+
+/* Временные стили для тестирования Tailwind */
+.absolute {
+  position: absolute !important;
+}
+
+.top-2 {
+  top: 0.5rem !important;
+}
+
+.left-2 {
+  left: 0.5rem !important;
+}
+
+.right-2 {
+  right: 0.5rem !important;
+}
+
+.bg-white {
+  background-color: rgb(255 255 255) !important;
+}
+
+.bg-black {
+  background-color: rgb(0 0 0) !important;
+}
+
+.bg-opacity-75 {
+  background-color: rgb(0 0 0 / 0.75) !important;
+}
+
+.bg-opacity-90 {
+  background-color: rgb(255 255 255 / 0.9) !important;
+}
+
+.text-white {
+  color: rgb(255 255 255) !important;
+}
+
+.px-2 {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.px-3 {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.py-1 {
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+}
+
+.py-2 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.rounded {
+  border-radius: 0.25rem !important;
+}
+
+.border {
+  border-width: 1px !important;
+}
+
+.text-xs {
+  font-size: 0.75rem !important;
+  line-height: 1rem !important;
+}
+
+.text-sm {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+.z-10 {
+  z-index: 10 !important;
+}
+
+.flex {
+  display: flex !important;
+}
+
+.flex-col {
+  flex-direction: column !important;
+}
+
+.space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem !important;
+}
+
+.space-x-1 > :not([hidden]) ~ :not([hidden]) {
+  margin-left: 0.25rem !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.w-3 {
+  width: 0.75rem !important;
+}
+
+.h-3 {
+  height: 0.75rem !important;
+}
+
+.bg-blue-500 {
+  background-color: rgb(59 130 246) !important;
+}
+
+.bg-yellow-500 {
+  background-color: rgb(234 179 8) !important;
+}
+
+.border-black {
+  border-color: rgb(0 0 0) !important;
+}
+
+.border-2 {
+  border-width: 2px !important;
+}
+
+.border-red-500 {
+  border-color: rgb(239 68 68) !important;
+}
+
+.text-gray-600 {
+  color: rgb(75 85 99) !important;
+}
+
+.relative {
+  position: relative !important;
+}
+
+.cursor-crosshair {
+  cursor: crosshair !important;
 }

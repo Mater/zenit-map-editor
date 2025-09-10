@@ -12,7 +12,7 @@ function App() {
           </h1>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 h-full">
           <div className="h-full flex gap-6">
             {/* Левая колонка - Визуализация карт */}
             <div className="flex-1 min-w-0">
