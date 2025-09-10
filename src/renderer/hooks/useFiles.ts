@@ -7,6 +7,41 @@ export function useFiles() {
   const { state, actions } = useApp();
 
   /**
+   * Проверка на дубликаты файлов по именам
+   */
+  const checkForDuplicatesByName = useCallback(
+    (fileNames: string[]): string[] => {
+      const existingFileNames = state.files.map(file =>
+        file.name.toLowerCase()
+      );
+      const uniqueFiles: string[] = [];
+
+      fileNames.forEach(fileName => {
+        const lowerFileName = fileName.toLowerCase();
+        if (!existingFileNames.includes(lowerFileName)) {
+          uniqueFiles.push(fileName);
+        }
+      });
+
+      return uniqueFiles;
+    },
+    [state.files]
+  );
+
+  /**
+   * Проверка на дубликаты файлов (File объекты)
+   */
+  const checkForDuplicates = useCallback(
+    (newFiles: File[]): File[] => {
+      const fileNames = newFiles.map(file => file.name);
+      const uniqueFileNames = checkForDuplicatesByName(fileNames);
+
+      return newFiles.filter(file => uniqueFileNames.includes(file.name));
+    },
+    [checkForDuplicatesByName]
+  );
+
+  /**
    * Загрузка файлов через диалог
    */
   const loadFilesFromDialog = useCallback(async () => {
@@ -21,9 +56,26 @@ export function useFiles() {
         return;
       }
 
+      // Извлекаем имена файлов для проверки дубликатов
+      const fileNames = filePaths.map(
+        filePath => filePath.split('/').pop() || filePath
+      );
+      const uniqueFileNames = checkForDuplicatesByName(fileNames);
+
+      // Если все файлы дубликаты, выходим
+      if (uniqueFileNames.length === 0) {
+        return;
+      }
+
+      // Фильтруем пути файлов, оставляя только уникальные
+      const uniqueFilePaths = filePaths.filter(filePath => {
+        const fileName = filePath.split('/').pop() || filePath;
+        return uniqueFileNames.includes(fileName);
+      });
+
       // Читаем содержимое файлов
       const fileContents = await Promise.all(
-        filePaths.map(async filePath => {
+        uniqueFilePaths.map(async filePath => {
           const result = await window.electronAPI.readFile(filePath);
           if (!result.success || !result.content) {
             throw new Error(`Ошибка чтения файла ${filePath}: ${result.error}`);
@@ -68,7 +120,7 @@ export function useFiles() {
       console.error('Ошибка загрузки файлов:', error);
       throw error;
     }
-  }, [actions]);
+  }, [actions, checkForDuplicatesByName]);
 
   /**
    * Загрузка файлов через File API (для drag & drop)
@@ -77,36 +129,22 @@ export function useFiles() {
     async (files: FileList) => {
       try {
         const fileArray = Array.from(files);
-        const mapFiles: MapFile[] = [];
 
-        for (let i = 0; i < fileArray.length; i++) {
-          const file = fileArray[i];
+        // Проверяем на дубликаты
+        const uniqueFiles = checkForDuplicates(fileArray);
 
-          // Проверяем расширение файла
-          if (!file.name.toLowerCase().endsWith('.map')) {
-            throw new Error(`Файл ${file.name} не является .map файлом`);
-          }
-
-          try {
-            const mapFile = await FileService.createMapFile(
-              file,
-              `file-${i}-${Date.now()}`
-            );
-            mapFiles.push(mapFile);
-          } catch (error) {
-            throw new Error(
-              `Ошибка обработки файла ${file.name}: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`
-            );
-          }
+        // Если все файлы дубликаты, выходим
+        if (uniqueFiles.length === 0) {
+          return;
         }
 
-        await actions.loadFiles(fileArray);
+        await actions.loadFiles(uniqueFiles);
       } catch (error) {
         console.error('Ошибка загрузки файлов:', error);
         throw error;
       }
     },
-    [actions]
+    [actions, checkForDuplicates]
   );
 
   /**
