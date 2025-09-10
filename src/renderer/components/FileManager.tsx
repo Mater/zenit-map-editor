@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { useFiles } from '../hooks/useFiles';
 import { useApp } from '../context/AppContext';
 import { MapFile } from '../types';
@@ -313,7 +313,7 @@ function FileItem({
     <div className="border border-gray-200 rounded-lg p-3 bg-white">
       {/* Заголовок файла */}
       <div className="flex items-center justify-between mb-2">
-        <label className="flex items-center space-x-2 cursor-pointer">
+        <div className="flex items-center space-x-2 cursor-pointer">
           <input
             type="checkbox"
             checked={file.visible}
@@ -321,9 +321,9 @@ function FileItem({
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           <span className="text-sm font-medium text-gray-900 truncate">
-            {file.name}
+            {file.name} kkuk
           </span>
-        </label>
+        </div>
       </div>
 
       {/* Карты файла */}
