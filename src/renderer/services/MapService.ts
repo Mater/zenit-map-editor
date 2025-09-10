@@ -352,6 +352,38 @@ export class MapService {
   }
 
   /**
+   * Отрисовка сообщения о пустом состоянии
+   */
+  private drawEmptyStateMessage(): void {
+    if (!this.ctx) return;
+
+    const centerX = this.config.width / 2;
+    const centerY = this.config.height / 2;
+
+    // Настройка стиля текста
+    this.ctx.fillStyle = '#6B7280'; // серый цвет
+    this.ctx.font = '16px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+
+    // Рисуем основное сообщение
+    this.ctx.fillText(
+      'Загрузите .map файлы для отображения карт',
+      centerX,
+      centerY
+    );
+
+    // Дополнительное сообщение меньшим шрифтом
+    this.ctx.font = '12px Arial';
+    this.ctx.fillStyle = '#9CA3AF'; // более светлый серый
+    this.ctx.fillText(
+      'Используйте кнопку "Загрузить файлы" для начала работы',
+      centerX,
+      centerY + 25
+    );
+  }
+
+  /**
    * Отрисовка всех карт
    */
   render(files: MapFile[], activeFileId?: string | null): void {
@@ -365,6 +397,12 @@ export class MapService {
     this.drawAxes();
     this.drawLabels();
     this.drawAxisValues();
+
+    // Если нет файлов для отображения, показываем сообщение
+    if (files.length === 0) {
+      this.drawEmptyStateMessage();
+      return;
+    }
 
     // Отрисовка карт
     files.forEach(file => {
