@@ -54,20 +54,6 @@ export class FileService {
   }
 
   /**
-   * Валидация .map файла
-   * @param content - содержимое файла
-   * @returns true если файл валиден
-   */
-  static validateMapFile(content: string): boolean {
-    try {
-      this.parseMapFile(content);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
    * Создание MapFile из File объекта
    * @param file - File объект
    * @param id - уникальный идентификатор
@@ -143,33 +129,5 @@ export class FileService {
    */
   static createMergedFile(gasolineFile: MapFile, gasFile: MapFile): string {
     return this.mergeMaps(gasolineFile.data.gasoline, gasFile.data.gas);
-  }
-
-  /**
-   * Получение статистики по карте
-   * @param map - карта точек
-   * @returns статистика
-   */
-  static getMapStats(map: MapPoint[]): {
-    minX: number;
-    maxX: number;
-    minY: number;
-    maxY: number;
-    count: number;
-  } {
-    if (map.length === 0) {
-      return { minX: 0, maxX: 0, minY: 0, maxY: 0, count: 0 };
-    }
-
-    const xValues = map.map(point => point.x);
-    const yValues = map.map(point => point.y);
-
-    return {
-      minX: Math.min(...xValues),
-      maxX: Math.max(...xValues),
-      minY: Math.min(...yValues),
-      maxY: Math.max(...yValues),
-      count: map.length,
-    };
   }
 }

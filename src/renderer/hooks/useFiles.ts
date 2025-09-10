@@ -60,7 +60,7 @@ export function useFiles() {
 
       await actions.loadFiles([]); // Очищаем текущие файлы
       // Добавляем новые файлы через dispatch
-      mapFiles.forEach(file => {
+      mapFiles.forEach(() => {
         // Здесь нужно будет обновить AppContext для поддержки добавления отдельных файлов
         // Пока используем временное решение
       });
@@ -153,36 +153,6 @@ export function useFiles() {
     [state.files, state.selectedGasolineMap, state.selectedGasMap]
   );
 
-  /**
-   * Получение статистики по файлам
-   */
-  const getFilesStats = useCallback(() => {
-    return state.files.map(file => ({
-      id: file.id,
-      name: file.name,
-      gasolineStats: FileService.getMapStats(file.data.gasoline),
-      gasStats: FileService.getMapStats(file.data.gas),
-      visible: file.visible,
-      gasolineVisible: file.gasolineVisible,
-      gasVisible: file.gasVisible,
-    }));
-  }, [state.files]);
-
-  /**
-   * Валидация файла
-   */
-  const validateFile = useCallback((content: string): boolean => {
-    return FileService.validateMapFile(content);
-  }, []);
-
-  /**
-   * Очистка всех файлов
-   */
-  const clearFiles = useCallback(() => {
-    // Нужно добавить действие в AppContext
-    console.log('Очистка файлов');
-  }, []);
-
   return {
     files: state.files,
     isLoading: state.isLoading,
@@ -190,9 +160,6 @@ export function useFiles() {
     loadFilesFromDialog,
     loadFilesFromFileList,
     saveMergedMap,
-    getFilesStats,
-    validateFile,
-    clearFiles,
     toggleFileVisibility: actions.toggleFileVisibility,
     toggleMapVisibility: actions.toggleMapVisibility,
     selectMap: actions.selectMap,
