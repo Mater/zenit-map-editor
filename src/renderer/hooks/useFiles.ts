@@ -76,9 +76,11 @@ export function useFiles() {
         }
 
         const gasolineFile = state.files.find(
-          f => f.id === state.selectedGasolineMap
+          file => file.id === state.selectedGasolineMap
         );
-        const gasFile = state.files.find(f => f.id === state.selectedGasMap);
+        const gasFile = state.files.find(
+          file => file.id === state.selectedGasMap
+        );
 
         if (!gasolineFile || !gasFile) {
           throw new Error(

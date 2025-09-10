@@ -138,14 +138,14 @@ export function MapViewer({ className = '' }: MapViewerProps) {
       return;
     }
 
-    const visiblePoints = points.filter(p => p.visible);
+    const visiblePoints = points.filter(point => point.visible);
     if (visiblePoints.length === 0) {
       setDataExtent(DEFAULT_DATA_EXTENT);
       return;
     }
 
-    const xValues = visiblePoints.map(p => p.x);
-    const yValues = visiblePoints.map(p => p.y);
+    const xValues = visiblePoints.map(point => point.x);
+    const yValues = visiblePoints.map(point => point.y);
 
     const dataMinX = Math.min(...xValues);
     const dataMaxX = Math.max(...xValues);
