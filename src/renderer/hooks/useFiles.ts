@@ -132,8 +132,7 @@ export function useFiles() {
 
         const mergedContent = FileService.createMergedFile(
           gasolineFile,
-          gasFile,
-          filename
+          gasFile
         );
 
         const result = await window.electronAPI.saveFile(

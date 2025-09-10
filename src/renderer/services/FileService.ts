@@ -23,10 +23,11 @@ export class FileService {
     for (let i = 0; i < lines.length; i += 4) {
       try {
         // X_бензин, Y_бензин, X_газ, Y_газ
-        const xGasoline = parseFloat(lines[i]);
-        const yGasoline = parseFloat(lines[i + 1]);
-        const xGas = parseFloat(lines[i + 2]);
-        const yGas = parseFloat(lines[i + 3]);
+        // Заменяем запятые на точки для корректного парсинга дробных чисел
+        const xGasoline = parseFloat(lines[i].replace(',', '.'));
+        const yGasoline = parseFloat(lines[i + 1].replace(',', '.'));
+        const xGas = parseFloat(lines[i + 2].replace(',', '.'));
+        const yGas = parseFloat(lines[i + 3].replace(',', '.'));
 
         // Валидация числовых значений
         if (
@@ -123,10 +124,10 @@ export class FileService {
       const gasPoint2 = gasMap[i];
 
       lines.push(
-        gasPoint.x.toString(),
-        gasPoint.y.toString(),
-        gasPoint2.x.toString(),
-        gasPoint2.y.toString()
+        gasPoint.x.toString().replace('.', ','),
+        gasPoint.y.toString().replace('.', ','),
+        gasPoint2.x.toString().replace('.', ','),
+        gasPoint2.y.toString().replace('.', ',')
       );
     }
 
@@ -140,26 +141,8 @@ export class FileService {
    * @param filename - имя результирующего файла
    * @returns содержимое объединенного файла
    */
-  static createMergedFile(
-    gasolineFile: MapFile,
-    gasFile: MapFile,
-    filename: string
-  ): string {
-    const mergedContent = this.mergeMaps(
-      gasolineFile.data.gasoline,
-      gasFile.data.gas
-    );
-
-    // Добавляем комментарий с информацией о файлах
-    const header = `# Объединенная топливная карта
-# Бензиновая карта: ${gasolineFile.name}
-# Газовая карта: ${gasFile.name}
-# Дата создания: ${new Date().toISOString()}
-# Имя файла: ${filename}
-
-`;
-
-    return header + mergedContent;
+  static createMergedFile(gasolineFile: MapFile, gasFile: MapFile): string {
+    return this.mergeMaps(gasolineFile.data.gasoline, gasFile.data.gas);
   }
 
   /**

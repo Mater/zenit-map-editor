@@ -18,13 +18,13 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * Генерация имени файла на основе выбранной бензиновой карты или первого файла
+   * Генерация имени файла на основе выбранной газовой карты или первого файла
    */
   const generateFilename = useCallback(() => {
-    // Если выбрана бензиновая карта, используем её имя
-    if (state.selectedGasolineMap) {
+    // Если выбрана газовая карта, используем её имя
+    if (state.selectedGasMap) {
       const selectedFile = state.files.find(
-        file => file.id === state.selectedGasolineMap
+        file => file.id === state.selectedGasMap
       );
       if (selectedFile) {
         const baseName = selectedFile.name.replace(/\.map$/i, '');
@@ -41,7 +41,7 @@ export function ControlPanel({ className = '' }: ControlPanelProps) {
 
     // По умолчанию
     return '';
-  }, [state.selectedGasolineMap, state.files]);
+  }, [state.selectedGasMap, state.files]);
 
   /**
    * Автоматическое обновление имени файла при изменении выбранной карты или файлов
