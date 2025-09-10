@@ -17,7 +17,7 @@ export function FileItem({ file }: FileItemProps) {
           ? 'border-blue-500 bg-blue-50 shadow-md'
           : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
       }`}
-      onClick={() => actions.setActiveFile(file.id)}
+      onClick={() => actions.setActiveFile(isActive ? null : file.id)}
     >
       {/* Заголовок файла */}
       <div className="mb-3 flex items-center justify-between">
