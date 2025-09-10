@@ -1,6 +1,7 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import type { MapPoint } from '../types';
+import { DEFAULT_DATA_EXTENT } from '../constants/mapDefaults';
 
 interface MapViewerProps {
   className?: string;
@@ -34,12 +35,7 @@ export function MapViewer({ className = '' }: MapViewerProps) {
     type: 'gasoline' | 'gas';
   } | null>(null);
 
-  const [dataExtent, setDataExtent] = useState({
-    xMin: 0,
-    xMax: 100,
-    yMin: 0,
-    yMax: 100,
-  });
+  const [dataExtent, setDataExtent] = useState(DEFAULT_DATA_EXTENT);
 
   // Настройки отображения
   const config = {
@@ -138,13 +134,13 @@ export function MapViewer({ className = '' }: MapViewerProps) {
   // Вычисление границ данных
   useEffect(() => {
     if (points.length === 0) {
-      setDataExtent({ xMin: 0, xMax: 100, yMin: 0, yMax: 100 });
+      setDataExtent(DEFAULT_DATA_EXTENT);
       return;
     }
 
     const visiblePoints = points.filter(p => p.visible);
     if (visiblePoints.length === 0) {
-      setDataExtent({ xMin: 0, xMax: 100, yMin: 0, yMax: 100 });
+      setDataExtent(DEFAULT_DATA_EXTENT);
       return;
     }
 
