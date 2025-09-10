@@ -1,0 +1,39 @@
+---
+description: Variable naming rules
+globs:
+alwaysApply: true
+---
+
+## Variable Naming Rules
+
+### Single Letter Variables
+
+- **DO NOT** use single-letter variable names (e.g., `i`, `j`, `k`, `x`, `y`, `z`)
+- **EXCEPTIONS**: Only allowed in very specific contexts:
+  - Loop counters in simple for loops: `for (let i = 0; i < length; i++)`
+  - Mathematical formulas where single letters are conventional: `const a = b * c + d`
+  - Destructuring with single-letter properties: `const { x, y } = point`
+
+### Preferred Alternatives
+
+- Use descriptive names: `index`, `counter`, `item`, `element`
+- Use meaningful abbreviations: `idx`, `cnt`, `elem`
+- Use context-specific names: `fileIndex`, `userCount`, `mapPoint`
+
+### Examples
+
+❌ **Bad:**
+
+```typescript
+const i = 0;
+const x = data.x;
+const f = files.find(f => f.id === id);
+```
+
+✅ **Good:**
+
+```typescript
+const index = 0;
+const xCoordinate = data.x;
+const file = files.find(file => file.id === id);
+```

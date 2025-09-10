@@ -3,13 +3,6 @@ import { FileItem } from '../components/FileItem';
 
 export function FilesList() {
   const { state, actions } = useApp();
-  const toggleAllFiles = (visible: boolean) => {
-    state.files.forEach(file => {
-      if (file.visible !== visible) {
-        actions.toggleFileVisibility(file.id);
-      }
-    });
-  };
 
   if (state.files.length === 0) {
     return (
@@ -36,6 +29,14 @@ export function FilesList() {
       </div>
     );
   }
+
+  const toggleAllFiles = (visible: boolean) => {
+    state.files.forEach(file => {
+      if (file.visible !== visible) {
+        actions.toggleFileVisibility(file.id);
+      }
+    });
+  };
 
   return (
     <div className="flex-1 min-h-0 flex flex-col">
