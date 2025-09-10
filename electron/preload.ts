@@ -24,3 +24,24 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   // You can expose other APTs you need here.
   // ...
 });
+
+// --------- Expose file system API ---------
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Открытие диалога выбора файлов
+  openFileDialog: () => ipcRenderer.invoke('dialog:openFile'),
+
+  // Сохранение файла
+  saveFile: (content: string, filename: string) =>
+    ipcRenderer.invoke('dialog:saveFile', content, filename),
+
+  // Чтение файла
+  readFile: (filePath: string) => ipcRenderer.invoke('fs:readFile', filePath),
+
+  // Запись файла
+  writeFile: (filePath: string, content: string) =>
+    ipcRenderer.invoke('fs:writeFile', filePath, content),
+
+  // Получение информации о файле
+  getFileInfo: (filePath: string) =>
+    ipcRenderer.invoke('fs:getFileInfo', filePath),
+});

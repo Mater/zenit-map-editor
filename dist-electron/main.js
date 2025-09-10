@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
+import * as fs from "fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,85 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
+  }
+});
+ipcMain.handle("dialog:openFile", async () => {
+  const result = await dialog.showOpenDialog(win, {
+    properties: ["openFile", "multiSelections"],
+    filters: [
+      { name: "Map Files", extensions: ["map"] },
+      { name: "All Files", extensions: ["*"] }
+    ]
+  });
+  if (!result.canceled) {
+    return result.filePaths;
+  }
+  return [];
+});
+ipcMain.handle(
+  "dialog:saveFile",
+  async (_, content, filename) => {
+    const result = await dialog.showSaveDialog(win, {
+      defaultPath: filename,
+      filters: [
+        { name: "Map Files", extensions: ["map"] },
+        { name: "All Files", extensions: ["*"] }
+      ]
+    });
+    if (!result.canceled && result.filePath) {
+      try {
+        await fs.promises.writeFile(result.filePath, content, "utf8");
+        return { success: true, path: result.filePath };
+      } catch (error) {
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error"
+        };
+      }
+    }
+    return { success: false, error: "Save cancelled" };
+  }
+);
+ipcMain.handle("fs:readFile", async (_, filePath) => {
+  try {
+    const content = await fs.promises.readFile(filePath, "utf8");
+    return { success: true, content };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+});
+ipcMain.handle("fs:writeFile", async (_, filePath, content) => {
+  try {
+    await fs.promises.writeFile(filePath, content, "utf8");
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+});
+ipcMain.handle("fs:getFileInfo", async (_, filePath) => {
+  try {
+    const stats = await fs.promises.stat(filePath);
+    return {
+      success: true,
+      info: {
+        name: path.basename(filePath),
+        path: filePath,
+        size: stats.size,
+        modified: stats.mtime,
+        created: stats.birthtime
+      }
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
   }
 });
 app.whenReady().then(createWindow);

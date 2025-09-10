@@ -23,3 +23,15 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   // You can expose other APTs you need here.
   // ...
 });
+electron.contextBridge.exposeInMainWorld("electronAPI", {
+  // Открытие диалога выбора файлов
+  openFileDialog: () => electron.ipcRenderer.invoke("dialog:openFile"),
+  // Сохранение файла
+  saveFile: (content, filename) => electron.ipcRenderer.invoke("dialog:saveFile", content, filename),
+  // Чтение файла
+  readFile: (filePath) => electron.ipcRenderer.invoke("fs:readFile", filePath),
+  // Запись файла
+  writeFile: (filePath, content) => electron.ipcRenderer.invoke("fs:writeFile", filePath, content),
+  // Получение информации о файле
+  getFileInfo: (filePath) => electron.ipcRenderer.invoke("fs:getFileInfo", filePath)
+});
